@@ -18,11 +18,14 @@ type PublishContext struct {
 	ctx        context.Context
 	cancelFunc context.CancelFunc
 
-	exchange  string
+	// exchange name
+	exchange string
+	// routing key
 	key       string
 	mandatory bool
 	immediate bool
 
+	// marshal func and unmarsh func
 	Unmarshal UnmarshalFunc
 	Marshal   MarshalFunc
 }
@@ -37,6 +40,14 @@ func NewDefaultPublishContext() *PublishContext {
 		Marshal:    _marshal,
 		Unmarshal:  _unmarshal,
 	}
+}
+
+func (c *PublishContext) Exchange() string {
+	return c.exchange
+}
+
+func (c *PublishContext) Key() string {
+	return c.key
 }
 
 func WithContext(ctx context.Context, cancelFunc context.CancelFunc) PublishOption {
