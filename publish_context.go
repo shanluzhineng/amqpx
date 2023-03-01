@@ -25,9 +25,8 @@ type PublishContext struct {
 	mandatory bool
 	immediate bool
 
-	// marshal func and unmarsh func
-	Unmarshal UnmarshalFunc
-	Marshal   MarshalFunc
+	// marshal func
+	Marshal MarshalFunc
 }
 
 type PublishOption func(c *PublishContext)
@@ -38,7 +37,6 @@ func NewDefaultPublishContext() *PublishContext {
 		ctx:        ctx,
 		cancelFunc: cancelFunc,
 		Marshal:    _marshal,
-		Unmarshal:  _unmarshal,
 	}
 }
 

@@ -21,9 +21,100 @@ func _unmarshal(b []byte, value interface{}) error {
 	case *string:
 		*value = string(b)
 		return nil
-	default:
-		return json.Unmarshal(b, value)
+	case *bool:
+		bValue, err := strconv.ParseBool(string(b))
+		if err != nil {
+			return err
+		}
+		*value = bValue
+		return nil
+	case *float64:
+		fValue, err := strconv.ParseFloat(string(b), 64)
+		if err != nil {
+			return err
+		}
+		*value = fValue
+		return nil
+	case *float32:
+		fValue, err := strconv.ParseFloat(string(b), 32)
+		if err != nil {
+			return err
+		}
+		*value = float32(fValue)
+		return nil
+	case *int:
+		iValue, err := strconv.ParseInt(string(b), 10, 0)
+		if err != nil {
+			return err
+		}
+		*value = int(iValue)
+		return nil
+	case *int64:
+		iValue, err := strconv.ParseInt(string(b), 10, 64)
+		if err != nil {
+			return err
+		}
+		*value = iValue
+		return nil
+	case *int32:
+		iValue, err := strconv.ParseInt(string(b), 10, 32)
+		if err != nil {
+			return err
+		}
+		*value = int32(iValue)
+		return nil
+	case *int16:
+		iValue, err := strconv.ParseInt(string(b), 10, 16)
+		if err != nil {
+			return err
+		}
+		*value = int16(iValue)
+		return nil
+	case *int8:
+		iValue, err := strconv.ParseInt(string(b), 10, 8)
+		if err != nil {
+			return err
+		}
+		*value = int8(iValue)
+		return nil
+	case *uint:
+		iValue, err := strconv.ParseUint(string(b), 10, 0)
+		if err != nil {
+			return err
+		}
+		*value = uint(iValue)
+		return nil
+	case *uint64:
+		iValue, err := strconv.ParseUint(string(b), 10, 64)
+		if err != nil {
+			return err
+		}
+		*value = iValue
+		return nil
+	case *uint32:
+		iValue, err := strconv.ParseUint(string(b), 10, 32)
+		if err != nil {
+			return err
+		}
+		*value = uint32(iValue)
+		return nil
+	case *uint16:
+		iValue, err := strconv.ParseUint(string(b), 10, 16)
+		if err != nil {
+			return err
+		}
+		*value = uint16(iValue)
+		return nil
+	case *uint8:
+		iValue, err := strconv.ParseUint(string(b), 10, 8)
+		if err != nil {
+			return err
+		}
+		*value = uint8(iValue)
+		return nil
 	}
+
+	return json.Unmarshal(b, value)
 }
 
 func _marshal(value interface{}) ([]byte, error) {

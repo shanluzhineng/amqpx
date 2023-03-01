@@ -34,6 +34,7 @@ const (
 // durable, so queues that bind to these pre-declared exchanges must also be
 // durable.
 type ExchangeDeclare struct {
+
 	//Exchange names starting with "amq." are reserved for pre-declared and
 	// standardized exchanges. The client MAY declare an exchange starting with
 	// "amq." if the passive option is set, or the exchange already exists.  Names can

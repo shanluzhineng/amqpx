@@ -16,8 +16,13 @@ type AMQPClient struct {
 	options *rabbitmq.DialOptions
 
 	isConnected bool
-	conn        *amqp.Connection
-	channel     *amqp.Channel
+
+	conn    *amqp.Connection
+	channel *amqp.Channel
+}
+
+type WithChannel struct {
+	Channel *amqp.Channel
 }
 
 // new a AMQPClient
@@ -43,6 +48,10 @@ func Client() *AMQPClient {
 
 // connect to amqp server and create channel
 func (c *AMQPClient) Connect() error {
+	if c.isConnected {
+		return nil
+	}
+
 	conn, err := amqp.Dial(c.options.RawUrl)
 	if err != nil {
 		return err
@@ -57,6 +66,15 @@ func (c *AMQPClient) Connect() error {
 	c.isConnected = true
 
 	return nil
+}
+
+// get a new channel from amqp
+func (c *AMQPClient) GetNewChannel() (*amqp.Channel, error) {
+	err := c.ensureConnect()
+	if err != nil {
+		return nil, err
+	}
+	return c.conn.Channel()
 }
 
 // Close client
@@ -85,9 +103,6 @@ func (c *AMQPClient) IsConnected() bool {
 }
 
 func (c *AMQPClient) ensureConnect() error {
-	if c.isConnected {
-		return nil
-	}
 	return c.Connect()
 }
 
@@ -97,6 +112,7 @@ func (c *AMQPClient) ExchangeDeclare(declare ExchangeDeclare) error {
 	if err != nil {
 		return err
 	}
+
 	return c.channel.ExchangeDeclare(declare.Name,
 		string(declare.Kind),
 		declare.Durable,
@@ -138,7 +154,13 @@ func (c *AMQPClient) QueueBind(bind QueueBind) error {
 }
 
 // publish data to exchange
-func (c *AMQPClient) PublishWithContext(ctx context.Context, exchange, key string, mandatory, immediate bool, data []byte) error {
+func (c *AMQPClient) PublishWithContext(ctx context.Context,
+	exchange string,
+	key string,
+	mandatory bool,
+	immediate bool,
+	data []byte,
+	channel ...WithChannel) error {
 	if len(data) == 0 {
 		return fmt.Errorf("argument data is empty")
 	}
@@ -149,7 +171,11 @@ func (c *AMQPClient) PublishWithContext(ctx context.Context, exchange, key strin
 	if err != nil {
 		return err
 	}
-	err = c.channel.PublishWithContext(ctx,
+	usedChannel := c.channel
+	if len(channel) > 0 {
+		usedChannel = channel[0].Channel
+	}
+	err = usedChannel.PublishWithContext(ctx,
 		exchange,  // exchange
 		key,       // routing key
 		mandatory, // mandatory
@@ -159,4 +185,28 @@ func (c *AMQPClient) PublishWithContext(ctx context.Context, exchange, key strin
 			Body:        data,
 		})
 	return err
+}
+
+// consume queue
+//
+// channel parameter indicate used specified channel,if nil or empty,then used default channel
+func (c *AMQPClient) Consume(consume *QueueConsume, channel ...WithChannel) (<-chan amqp.Delivery, error) {
+	if consume.Queue == "" {
+		return nil, fmt.Errorf("consum.Queue field value cannot be empty")
+	}
+	err := c.ensureConnect()
+	if err != nil {
+		return nil, err
+	}
+	usedChannel := c.channel
+	if len(channel) > 0 {
+		usedChannel = channel[0].Channel
+	}
+	return usedChannel.Consume(consume.Queue,
+		consume.Consumer,
+		consume.AutoAck,
+		consume.Exclusive,
+		false,
+		consume.NoWait,
+		consume.Args)
 }
