@@ -153,6 +153,18 @@ func (c *AMQPClient) QueueBind(bind QueueBind) error {
 	return nil
 }
 
+func (c *AMQPClient) Qos(prefetchCount, prefetchSize int, global bool, channel ...WithChannel) error {
+	err := c.ensureConnect()
+	if err != nil {
+		return err
+	}
+	usedChannel := c.channel
+	if len(channel) > 0 {
+		usedChannel = channel[0].Channel
+	}
+	return usedChannel.Qos(prefetchCount, prefetchSize, global)
+}
+
 // publish data to exchange
 func (c *AMQPClient) PublishWithContext(ctx context.Context,
 	exchange string,
