@@ -35,7 +35,7 @@ type QueueConsume struct {
 func NewDefaultQueueConsume(queue string) *QueueConsume {
 	c := &QueueConsume{
 		Queue:     queue,
-		AutoAck:   true,
+		AutoAck:   false,
 		Exclusive: false,
 		NoWait:    false,
 	}
