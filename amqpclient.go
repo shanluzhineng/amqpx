@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/abmpio/configurationx/options/rabbitmq"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/shanluzhineng/configurationx/options/rabbitmq"
 )
 
 var (

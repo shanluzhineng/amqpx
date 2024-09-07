@@ -1,10 +1,10 @@
-module github.com/abmpio/amqpx
+module github.com/shanluzhineng/amqpx
 
-go 1.18
+go 1.22
 
 require (
-	github.com/abmpio/configurationx v0.0.0-20230222093905-cdd959212331
 	github.com/rabbitmq/amqp091-go v1.7.0
+	github.com/shanluzhineng/configurationx v0.0.1
 )
 
 require (
